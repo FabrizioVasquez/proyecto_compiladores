@@ -31,8 +31,19 @@
 %token	<int>	INTEGER_LITERAL
 %nterm <int> exp term factor
 %token PAR_BEGIN PAR_END
-%left	PLUS REST
-%left	MULT
+%token ENTERO
+%token RETORNO
+%token SINRETORNO
+%token MIENTRAS
+%token SI
+%token SINO
+%token PRINCIPAL
+%token DIV
+%token RELOP
+%token ASSIGN
+%token ERROR
+%left	SUM RES
+%left	MUL
 
 %%
 
@@ -45,7 +56,7 @@ exp:  exp opsuma term { $$ = $1 + $3; }
     | term  { $$ = $1; }
     ;
 
-opsuma: PLUS
+opsuma: SUM
     ;
 
 oprest: REST
@@ -55,7 +66,7 @@ term: term opmult factor  { $$ = $1 * $3; }
     | factor  { $$ = $1; }
     ;
 
-opmult: MULT
+opmult: MUL
     ;
 
 factor: PAR_BEGIN exp PAR_END { $$ = $2; }
