@@ -32,6 +32,7 @@
 %nterm <int> exp term factor
 %token PAR_BEGIN PAR_END
 %token ENTERO
+%token IDENTIFICADOR
 %token RETORNO
 %token SINRETORNO
 %token MIENTRAS
@@ -59,7 +60,7 @@ exp:  exp opsuma term { $$ = $1 + $3; }
 opsuma: SUM
     ;
 
-oprest: REST
+oprest: RES
     ;
 
 term: term opmult factor  { $$ = $1 * $3; }
