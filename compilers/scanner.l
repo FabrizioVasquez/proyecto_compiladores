@@ -7,20 +7,21 @@
 %option c++ interactive noyywrap noyylineno nodefault
 
 digit		[0-9]
-int_const	[+-]?{digit}{digit}+
+digit_      [1-9]
+int_const	{digit_}+{digit}*
 letra   [a-zA-Z]
 
 %%
 
-"entero"  return Parser::token::ENTERO;
-"retorno" return Parser::token::RETORNO;
-"sin_tipo" return Parser::token::SINRETORNO;
-"mientras" return Parser::token::MIENTRAS;
-"si"  return Parser::token::SI;
-"sino" return Parser::token::SINO;
-"main" return Parser::token::PRINCIPAL;
+"entero"  {return Parser::token::ENTERO;}
+"retorno" {return Parser::token::RETORNO;}
+"sin_tipo" {return Parser::token::SINRETORNO;}
+"mientras" {return Parser::token::MIENTRAS;}
+"si"  {return Parser::token::SI;}
+"sino" {return Parser::token::SINO;}
+"main" {return Parser::token::PRINCIPAL;}
 
-{letra}+{letra}* return Categoria::IDENTIFICADOR;
+{letra}+{letra}* return Parser::token::IDENTIFICADOR;
 {int_const}	{ yylval->emplace<int>(atoi(YYText())); return Parser::token::INTEGER_LITERAL;}
 
 "+"		{ return Parser::token::SUM; }
