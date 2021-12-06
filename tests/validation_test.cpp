@@ -23,8 +23,13 @@ TEST_P(ParamTest, basicTest) {
 INSTANTIATE_TEST_SUITE_P(SimpleTest, ParamTest,
                          testing::Values(std::make_pair("entero a;" ,777),
                                          std::make_pair("entero a[5];", 777),
-                                         std::make_pair("sin_tipo a(){}", 777),
-                                         std::make_pair("entero a(){}",777)
+                                         std::make_pair("entero a(entero c[], entero n){entero b;}", 777),
+                                         std::make_pair("sin_tipo a(entero b){}", 777),
+                                         std::make_pair("sin_tipo a(entero b,entero c){}", 777),
+                                         std::make_pair("entero a(entero c[], entero n){}", 777),
+                                         std::make_pair("entero a(sin_tipo){}", 777)//,
+                                         //std::make_pair("entero a(){}",777),
+                                         //std::make_pair("entero a[]",777)
                                          ));
 
 int main(int argc, char** argv) {

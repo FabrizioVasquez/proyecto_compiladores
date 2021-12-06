@@ -29,7 +29,7 @@
 %start programa 
 
 %token	<int>	INTEGER_LITERAL
-%nterm <int> exp term factor
+//%nterm <int> exp term factor
 %token PAR_BEGIN PAR_END 
 %token LLAVES_BEGIN LLAVES_END
 %token CORCH_BEGIN CORCH_END
@@ -60,11 +60,12 @@ lista_declaracion: lista_declaracion declaracion
                    | declaracion;
 
 declaracion: ENTERO IDENTIFICADOR declaracion_fact
-           | SIN_TIPO IDENTIFICADOR PAR_BEGIN PAR_END LLAVES_BEGIN LLAVES_END;
+           | SIN_TIPO IDENTIFICADOR PAR_BEGIN params sent_compuesta;
 
 //factorizacion de declaracion
 declaracion_fact: var_declaracion_fact 
-           |      PAR_BEGIN PAR_END LLAVES_BEGIN LLAVES_END;
+           |      PAR_BEGIN SIN_TIPO PAR_END LLAVES_BEGIN LLAVES_END
+           |      PAR_BEGIN params PAR_END LLAVES_BEGIN LLAVES_END;
 
 //var_declaracion: ENTERO IDENTIFICADOR var_declaracion_fact;
 
@@ -75,11 +76,9 @@ var_declaracion_fact: PUNTO_COMA
 tipo: ENTERO 
     | SIN_TIPO;
 
-
 //fun_declaracion: tipo IDENTIFICADOR PAR_BEGIN PAR_END LLAVES_BEGIN LLAVES_END;
 
-
-params: lista_declaracion 
+params: lista_params 
         | SIN_TIPO
         ;
 
@@ -91,32 +90,66 @@ param: tipo IDENTIFICADOR
         | tipo IDENTIFICADOR CORCH_BEGIN CORCH_END
         ;
 
+sent_compuesta: LLAVES_BEGIN declaracion_local lista_sentencias LLAVES_END;
 
-input:		/* empty */
-		| exp	{ *result = $1; }
-		;
+declaracion_local: declaracion_local ENTERO IDENTIFICADOR declaracion_fact 
+        | SIN_TIPO
+        ;
+lista_sentencias: lista_sentencias sentencia
+        | SIN_TIPO;
 
-exp:  exp opsuma term { $$ = $1 + $3; }
-    | exp oprest term { $$ = $1 - $3; }
-    | term  { $$ = $1; }
-    ;       
+sentencia: sentencia_expresion
+        | sentencia_seleccion
+        | sentencia_iteracion
+        | sentencia_retorno;
 
-opsuma: SUM
-    ;
+sentencia_expresion: expresion PUNTO_COMA
+        | PUNTO_COMA;
 
-oprest: RES
-    ;
+sentencia_iteracion: MIENTRAS PAR_BEGIN expresion PAR_END LLAVES_BEGIN lista_sentencias LLAVES_END;
 
-term: term opmult factor  { $$ = $1 * $3; }
-    | factor  { $$ = $1; }
-    ;
+sentencia_retorno: RETORNO PUNTO_COMA
+        | RETORNO expresion PUNTO_COMA;
 
-opmult: MUL
-    ;
+sentencia_seleccion: SI PAR_BEGIN expresion PAR_END sentencia 
+        |  SI PAR_BEGIN expresion PAR_END sentencia SINO sentencia;        
 
-factor: PAR_BEGIN exp PAR_END { $$ = $2; }
-    | INTEGER_LITERAL 	{ $$ = $1; }
-    ;
+expresion: var ASSIGN expresion
+        | expresion_simple;
+
+var: IDENTIFICADOR
+        | IDENTIFICADOR CORCH_BEGIN expresion CORCH_END;
+
+expresion_simple: expresion_aditiva RELOP expresion_aditiva
+        | expresion_aditiva;
+
+// RELOP
+
+expresion_aditiva: expresion_aditiva addop term 
+        | term;
+
+addop: SUM
+        | RES;
+
+term: term mulop factor
+        | factor;
+
+mulop: MUL 
+        | DIV;
+
+factor: PAR_BEGIN expresion PAR_END
+        | var
+        | call
+        | NUM;
+
+call: IDENTIFICADOR PAR_BEGIN lista_arg PAR_END
+        | IDENTIFICADOR PAR_BEGIN PAR_END;
+
+
+lista_arg: lista_arg COMA expresion
+        | expresion;
+
+
 %%
 
 void utec::compilers::Parser::error(const std::string& msg) {
