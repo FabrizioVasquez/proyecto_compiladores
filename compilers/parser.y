@@ -3,6 +3,7 @@
 #include <string>
 #include <cmath>
 #include <FlexLexer.h>
+#include <semantico.h>
 %}
 
 %require "3.5.1"
@@ -41,8 +42,8 @@
 %token SINRETORNO
 %token SIN_TIPO
 %token MIENTRAS
-%token SI
-%token SINO
+%nonassoc SI
+%nonassoc SINO
 %token PRINCIPAL
 %token DIV
 %token RELOP
@@ -60,12 +61,11 @@ lista_declaracion: lista_declaracion declaracion
                    | declaracion;
 
 declaracion: ENTERO IDENTIFICADOR declaracion_fact
-           | SIN_TIPO IDENTIFICADOR PAR_BEGIN params sent_compuesta;
+           | SIN_TIPO IDENTIFICADOR PAR_BEGIN params PAR_END sent_compuesta;
 
 //factorizacion de declaracion
-declaracion_fact: var_declaracion_fact 
-           |      PAR_BEGIN SIN_TIPO PAR_END LLAVES_BEGIN LLAVES_END
-           |      PAR_BEGIN params PAR_END LLAVES_BEGIN LLAVES_END;
+declaracion_fact: var_declaracion_fact
+           |      PAR_BEGIN params PAR_END sent_compuesta;
 
 //var_declaracion: ENTERO IDENTIFICADOR var_declaracion_fact;
 
@@ -90,18 +90,24 @@ param: tipo IDENTIFICADOR
         | tipo IDENTIFICADOR CORCH_BEGIN CORCH_END
         ;
 
-sent_compuesta: LLAVES_BEGIN declaracion_local lista_sentencias LLAVES_END;
+sent_compuesta: LLAVES_BEGIN contenido_sent_compuesta LLAVES_END
+        | LLAVES_BEGIN LLAVES_END;
 
-declaracion_local: declaracion_local ENTERO IDENTIFICADOR declaracion_fact 
-        | SIN_TIPO
-        ;
+contenido_sent_compuesta: declaracion_local lista_sentencias
+        | lista_sentencias
+        | declaracion_local;
+
+declaracion_local: declaracion_local ENTERO IDENTIFICADOR declaracion_fact
+        | ENTERO IDENTIFICADOR declaracion_fact;
+
 lista_sentencias: lista_sentencias sentencia
-        | SIN_TIPO;
+        | sentencia;
 
 sentencia: sentencia_expresion
         | sentencia_seleccion
         | sentencia_iteracion
-        | sentencia_retorno;
+        | sentencia_retorno
+        ;
 
 sentencia_expresion: expresion PUNTO_COMA
         | PUNTO_COMA;
@@ -111,8 +117,9 @@ sentencia_iteracion: MIENTRAS PAR_BEGIN expresion PAR_END LLAVES_BEGIN lista_sen
 sentencia_retorno: RETORNO PUNTO_COMA
         | RETORNO expresion PUNTO_COMA;
 
-sentencia_seleccion: SI PAR_BEGIN expresion PAR_END sentencia 
-        |  SI PAR_BEGIN expresion PAR_END sentencia SINO sentencia;        
+sentencia_seleccion: SI PAR_BEGIN expresion PAR_END sentencia
+        | SI PAR_BEGIN expresion PAR_END sentencia SINO sentencia;
+
 
 expresion: var ASSIGN expresion
         | expresion_simple;
@@ -150,7 +157,7 @@ lista_arg: lista_arg COMA expresion
         | expresion;
 
 
-%%
+%%      
 
 void utec::compilers::Parser::error(const std::string& msg) {
     std::cerr << msg << " " /*<< yylineno*/ <<'\n';

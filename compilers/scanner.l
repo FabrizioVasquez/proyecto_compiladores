@@ -30,6 +30,8 @@ letra   [a-zA-Z]
 ">="    { return Parser::token::RELOP; }
 "="     { return Parser::token::ASSIGN; }
 "=="    { return Parser::token::RELOP; }
+"<"    { return Parser::token::RELOP; }
+">"    { return Parser::token::RELOP; }
 "@"     { return Parser::token::ERROR; }
 "{"     { return Parser::token::LLAVES_BEGIN; }
 "}"     { return Parser::token::LLAVES_END; }
