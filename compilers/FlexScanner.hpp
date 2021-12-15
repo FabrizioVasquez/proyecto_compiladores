@@ -4,11 +4,13 @@
 #if !defined(yyFlexLexerOnce)
 #include <FlexLexer.h>
 #endif
-
+#include <map>
 #include "parser.hpp"
 
 namespace utec {
 namespace compilers {
+
+
 
 class FlexScanner : public yyFlexLexer {
  public:
