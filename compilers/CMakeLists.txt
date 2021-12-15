@@ -7,6 +7,7 @@ IF(BISON_FOUND)
   BISON_TARGET(ParserTarget
     ${CMAKE_CURRENT_SOURCE_DIR}/parser.y
     ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp
+    VERBOSE REPORT_FILE ${CMAKE_CURRENT_BINARY_DIR}/parser.report
   )
 ENDIF()
 
