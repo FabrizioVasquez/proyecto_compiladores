@@ -2,11 +2,17 @@
 #include "parser.hpp"
 #include "FlexScanner.hpp"
 #define YY_DECL int utec::compilers::FlexScanner::lex(utec::compilers::Parser::semantic_type *yylval)
-#include "tokenAtt.h"
+#include <map>
+#include <utility>
+
 int caracter = 0;
+
+extern int line_number;
+extern std::map<std::string,std::pair<std::string, std::string>> tablaSimbol;
+extern std::string valorcito;
 %}
 
-%option c++ interactive noyywrap noyylineno nodefault
+%option c++ interactive noyywrap noyylineno nodefault yylineno
 
 digit		[0-9]
 digit_      [1-9]
@@ -43,13 +49,15 @@ letra   [a-zA-Z]
 ";"     { caracter++; return Parser::token::PUNTO_COMA; }
 ","     { caracter++; return Parser::token::COMA; }
 {letra}+{letra}* { 
-    tablaSimbol[yytext] = element();
+    std::pair<std::string, std::string> parcito("none", "none");
+    valorcito = "hola";
+    /*tablaSimbol[valorcito] = parcito;*/
        return Parser::token::IDENTIFICADOR;
     }
 
 
 [ \t]*		{}
-[\n]		{ yylineno++;}
+[\n]		{ yylineno++; line_number++;}
 
 .		{ std::cout<<"Error\n"; std::cerr << "ERROR LEXICO EN LINEA " << yylineno;  exit(1);	}
 
@@ -58,5 +66,7 @@ letra   [a-zA-Z]
 int yyFlexLexer::yylex() {
     throw std::runtime_error("Invalid call to yyFlexLexer::yylex()");
 }
+
+
 
 //{int_const}	{ yylval->emplace<int>(atoi(YYText())); return Parser::token::INTEGER_LITERAL;}

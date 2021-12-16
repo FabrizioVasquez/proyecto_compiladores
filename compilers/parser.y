@@ -4,14 +4,18 @@
 #include <cmath>
 #include <FlexLexer.h>
 #include <semantico.h>
-
+#include <map>
+#include <utility>
+int line_number = 1;
+extern std::map<std::string,std::pair<std::string, std::string>> tablaSimbol;
+std::string valorcito = "none";
 %}
-
 %require "3.5.1"
 %language "C++"
 
 %define api.parser.class {Parser}
 %define api.namespace {utec::compilers}
+
 %define api.value.type variant
 %parse-param {FlexScanner* scanner} {int* result}
 %code requires
@@ -25,6 +29,7 @@
 {
     #include "FlexScanner.hpp"
     #define yylex(x) scanner->lex(x)
+    
 }
 
 %start programa 
@@ -36,6 +41,7 @@
 %type <int_val> expresion_simple
 %type <int_val> term
 */
+
 %token PAR_BEGIN PAR_END 
 %token LLAVES_BEGIN LLAVES_END
 %token CORCH_BEGIN CORCH_END
@@ -67,7 +73,7 @@ lista_declaracion: lista_declaracion declaracion {printf("lista_declaracion");}
                    | declaracion {printf("lista_declaracion\n");}
                    ;
 
-declaracion: ENTERO IDENTIFICADOR declaracion_fact {printf("declaracion\n");}
+declaracion: ENTERO IDENTIFICADOR declaracion_fact { /*tablaSimbol[valorcito].first = "Entero"*/ ;printf("declaracion\n");}
            | SIN_TIPO IDENTIFICADOR PAR_BEGIN params PAR_END sent_compuesta{printf("declaracion\n");}
            ;
 
@@ -179,6 +185,6 @@ lista_arg: lista_arg COMA expresion {printf("list_arg\n");}
 
 void utec::compilers::Parser::error(const std::string& msg) {
     //extern std::string testing;
-    std::cerr << msg << "ERROR IN LINE " <<'\n';
+    std::cerr << msg << " en linea " << line_number   << '\n';
     //exit(1);
 }
